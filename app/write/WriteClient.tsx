@@ -19,6 +19,8 @@ export function WriteClient() {
   const styleParam = params.get('style');
   const [text, setText] = useState('');
   const [recipient, setRecipient] = useState('');
+  const [recipientName, setRecipientName] = useState('');
+  const [senderName, setSenderName] = useState('');
   const [withMoney, setWithMoney] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -62,6 +64,8 @@ export function WriteClient() {
           userInput: text,
           withMoney: def.key === 'remembrance' ? false : withMoney,
           recipient,
+          recipientName,
+          senderName,
         }),
       });
       const data = await res.json();
@@ -144,11 +148,44 @@ export function WriteClient() {
             </div>
             <input
               value={recipient}
-              onChange={(e) => setRecipient(e.target.value)}
-              placeholder="或自己写一个,如「外婆」「老朋友」「我自己」"
-              maxLength={20}
+              onChange={(e) => setRecipient(e.target.value.slice(0, 10))}
+              placeholder="或自己写一个,如「外婆」「老朋友」「我自己」(不超过 10 字)"
+              maxLength={10}
               className="w-full border border-ink/30 bg-transparent px-4 py-3 text-sm tracking-widest outline-none transition-colors focus:border-ink"
             />
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div>
+              <label className="mb-2 block text-xs tracking-[0.3em] opacity-60">
+                TA 的 名 字 <span className="opacity-60">(可空)</span>
+              </label>
+              <input
+                value={recipientName}
+                onChange={(e) => setRecipientName(e.target.value.slice(0, 10))}
+                placeholder="如「阿翠」「建国」"
+                maxLength={10}
+                className="w-full border border-ink/30 bg-transparent px-4 py-3 text-sm tracking-widest outline-none transition-colors focus:border-ink"
+              />
+              <p className="mt-2 text-[10px] tracking-wider opacity-55">
+                填了会出现在抬头,如「阿翠吾妻」「建国父亲膝下」
+              </p>
+            </div>
+            <div>
+              <label className="mb-2 block text-xs tracking-[0.3em] opacity-60">
+                我 是 <span className="opacity-60">(可空)</span>
+              </label>
+              <input
+                value={senderName}
+                onChange={(e) => setSenderName(e.target.value.slice(0, 10))}
+                placeholder="如「阿正」「建华」「长青」"
+                maxLength={10}
+                className="w-full border border-ink/30 bg-transparent px-4 py-3 text-sm tracking-widest outline-none transition-colors focus:border-ink"
+              />
+              <p className="mt-2 text-[10px] tracking-wider opacity-55">
+                填了会出现在落款,如「夫 阿正」「儿 建华」「孙 长青」
+              </p>
+            </div>
           </div>
 
           <div>

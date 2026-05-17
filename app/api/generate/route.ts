@@ -17,6 +17,8 @@ interface GenerateBody {
   userInput?: unknown;
   withMoney?: unknown;
   recipient?: unknown;
+  recipientName?: unknown;
+  senderName?: unknown;
 }
 
 function splitBodyAndSignature(letter: string): { body: string; signature: string } {
@@ -51,7 +53,9 @@ export async function POST(req: Request) {
   const style = typeof payload.style === 'string' ? payload.style : '';
   const userInput = typeof payload.userInput === 'string' ? payload.userInput.trim() : '';
   const withMoney = Boolean(payload.withMoney);
-  const recipient = typeof payload.recipient === 'string' ? payload.recipient.trim() : '';
+  const recipient = typeof payload.recipient === 'string' ? payload.recipient.trim().slice(0, 10) : '';
+  const recipientName = typeof payload.recipientName === 'string' ? payload.recipientName.trim().slice(0, 10) : '';
+  const senderName = typeof payload.senderName === 'string' ? payload.senderName.trim().slice(0, 10) : '';
 
   if (!isStyleKey(style)) {
     return NextResponse.json(
@@ -82,7 +86,7 @@ export async function POST(req: Request) {
     });
   }
 
-  const prompt = buildLetterPrompt({ style, userInput, withMoney, recipient });
+  const prompt = buildLetterPrompt({ style, userInput, withMoney, recipient, recipientName, senderName });
 
   let raw = '';
   try {
