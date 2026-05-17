@@ -88,9 +88,9 @@ export async function POST(req: Request) {
   try {
     raw = await chat({
       messages: [{ role: 'user', content: prompt }],
-      maxTokens: 6000,
-      temperature: 0.85,
-      timeoutMs: 45_000,
+      maxTokens: 8000,
+      temperature: 0.65,
+      timeoutMs: 50_000,
     });
   } catch (err) {
     console.error('generation failed', err);
