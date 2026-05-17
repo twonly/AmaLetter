@@ -20,10 +20,10 @@ export default function StylesPage() {
             ← 回 首 页
           </Link>
           <h1 className="font-master text-3xl tracking-[0.3em] sm:text-4xl">
-            先生,请问这封信是写给谁的?
+            你 想 让 先 生 替 你 写 给 谁?
           </h1>
           <p className="text-sm tracking-widest opacity-60">
-            选一种笔法。先生会按这个口气替你落笔。
+            选一种笔法。先生会按这个口气,替你落笔。
           </p>
         </motion.div>
 

@@ -23,6 +23,7 @@ export function LetterClient({ id }: { id: string }) {
   const [missing, setMissing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [envelopeOpen, setEnvelopeOpen] = useState(false);
+  const [cameFromShare, setCameFromShare] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [stampDown, setStampDown] = useState(false);
   const [compact, setCompact] = useState(false);
@@ -73,6 +74,7 @@ export function LetterClient({ id }: { id: string }) {
           signature: json.signature ?? '',
           ts: Date.now(),
         });
+        setCameFromShare(true);
         setEnvelopeOpen(true);
         setLoading(false);
       } catch {
@@ -161,16 +163,21 @@ export function LetterClient({ id }: { id: string }) {
     }
     try {
       const url = typeof window !== 'undefined' ? window.location.href : '';
+      const shareText = `先生替我写了一封侨批,给你看看。\n${url}`;
       if (navigator.share) {
         try {
-          await navigator.share({ title: '先生在等你', text: '我请先生替你写了一封侨批', url });
+          await navigator.share({
+            title: '一封侨批 · 先生代写',
+            text: '先生替我写了一封侨批,给你看看。',
+            url,
+          });
           return;
         } catch {
           // fall through to clipboard
         }
       }
-      await navigator.clipboard.writeText(url);
-      showToast('链接已复制,寄给亲人即可打开。');
+      await navigator.clipboard.writeText(shareText);
+      showToast('链接已复制 · 微信里点开后,「...」转发会生成卡片');
     } catch (err) {
       showToast('分享失败,先生原谅你。');
     }
@@ -197,9 +204,13 @@ export function LetterClient({ id }: { id: string }) {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: -200, rotate: -2 }}
-          animate={{ opacity: 1, y: 0, rotate: 0 }}
-          transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
+          initial={cameFromShare ? { opacity: 0 } : { opacity: 0, y: -200, rotate: -2 }}
+          animate={cameFromShare ? { opacity: 1 } : { opacity: 1, y: 0, rotate: 0 }}
+          transition={
+            cameFromShare
+              ? { duration: 1.2, delay: 0.2, ease: 'easeOut' }
+              : { duration: 1.6, ease: [0.16, 1, 0.3, 1] }
+          }
         >
           <LetterPaper
             ref={paperRef}
