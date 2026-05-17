@@ -22,6 +22,7 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
       style: stored.style,
       body: stored.body,
       signature: stored.signature,
+      remittanceAmount: stored.remittanceAmount ?? null,
     },
     { headers: { 'cache-control': 'public, max-age=60, s-maxage=300' } }
   );

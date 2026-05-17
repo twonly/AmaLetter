@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { packRemittanceSignature, unpackRemittanceSignature } from './remittance';
 import type { StyleKey } from './styles';
 
 const ALPHABET = '23456789abcdefghjkmnpqrstuvwxyz';
@@ -32,6 +33,7 @@ export interface StoredLetter {
   style: StyleKey;
   body: string;
   signature: string;
+  remittanceAmount?: number | null;
 }
 
 export async function saveLetter(letter: StoredLetter): Promise<boolean> {
@@ -41,7 +43,7 @@ export async function saveLetter(letter: StoredLetter): Promise<boolean> {
     id: letter.id,
     style: letter.style,
     body: letter.body,
-    signature: letter.signature,
+    signature: packRemittanceSignature(letter.signature, letter.remittanceAmount),
   });
   if (error) {
     console.warn('supabase insert failed', error.message);
@@ -59,5 +61,11 @@ export async function readLetter(id: string): Promise<StoredLetter | null> {
     .eq('id', id)
     .maybeSingle();
   if (error || !data) return null;
-  return data as StoredLetter;
+  const letter = data as StoredLetter;
+  const unpacked = unpackRemittanceSignature(letter.signature);
+  return {
+    ...letter,
+    signature: unpacked.signature,
+    remittanceAmount: unpacked.remittanceAmount,
+  };
 }

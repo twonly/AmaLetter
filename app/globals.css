@@ -77,6 +77,34 @@ button {
   color: #1a1a1a;
 }
 
+.result-action-button {
+  width: 100%;
+  min-height: 42px;
+  padding: 0.58rem 0.35rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.result-action-button:hover {
+  letter-spacing: 0.14em;
+}
+
+@media (min-width: 640px) {
+  .result-action-button {
+    width: auto;
+    min-height: 0;
+    padding: 0.85rem 2.2rem;
+    font-size: 0.9rem;
+    letter-spacing: 0.34em;
+  }
+
+  .result-action-button:hover {
+    letter-spacing: 0.45em;
+  }
+}
+
 .vertical-divider {
   width: 1px;
   height: 60px;

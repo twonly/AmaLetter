@@ -25,7 +25,7 @@ export default function HomePage() {
           <div className="relative shadow-[0_18px_60px_-30px_rgba(60,40,20,0.55)]">
             <Image
               src="/poster.jpg"
-              alt="致敬电影《给阿嬷的情书》"
+              alt="侨批生成器·先生 — 致敬电影《给阿嬷的情书》"
               width={1017}
               height={572}
               priority
@@ -53,7 +53,7 @@ export default function HomePage() {
             transition={{ duration: 1.4, delay: 1.3 }}
             className="font-master text-[1.7rem] tracking-[0.35em] sm:text-[2.2rem] sm:tracking-[0.4em]"
           >
-            先 生 在 等 你 写 信
+            先 生 · 侨 批 生 成 器
           </motion.h1>
 
           <motion.div
@@ -137,6 +137,13 @@ export default function HomePage() {
             意 见 反 馈 · by AI拯救打工人·一个潮汕人
           </a>
         </motion.div>
+
+        <section aria-hidden="true" className="sr-only">
+          <h2>什么是侨批生成器？</h2>
+          <p>
+            侨批生成器「先生」是一款 AI 代写侨批的在线工具，致敬电影《给阿嬷的情书》。侨批是海外华侨通过民间渠道寄回国内的汇款及家书，承载着游子对家乡亲人的思念。先生为你代笔，以南洋商旅体、闺阁守望体、少年游子体、暮年回望体四种笔法，写一封百年前的侨批。你可以写给爸爸、妈妈、阿公、阿嬷、故友，甚至已经离开的人。
+          </p>
+        </section>
       </main>
     </PaperBackground>
   );

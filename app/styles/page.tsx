@@ -1,47 +1,17 @@
-'use client';
+import type { Metadata } from 'next';
+import { StylesClient } from './StylesClient';
 
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import { PaperBackground } from '@/components/PaperBackground';
-import { StyleCard } from '@/components/StyleCard';
-import { STYLES, STYLE_ORDER } from '@/lib/styles';
+export const metadata: Metadata = {
+  title: '选择笔法 · 侨批生成器 — 南洋商旅体、闺阁守望体、少年游子体、暮年回望体',
+  description:
+    '侨批生成器四种笔法：南洋商旅体写给父亲爷爷、闺阁守望体写给阿嬷母亲妻子、少年游子体写给故友同窗、暮年回望体写给已故亲人。致敬《给阿嬷的情书》。',
+  openGraph: {
+    title: '选择笔法 · 侨批生成器',
+    description:
+      '南洋商旅体、闺阁守望体、少年游子体、暮年回望体——选一种笔法，让先生替你写一封侨批。',
+  },
+};
 
 export default function StylesPage() {
-  return (
-    <PaperBackground color="#f4ecd8" className="min-h-screen w-full px-6 py-16 text-ink">
-      <div className="mx-auto flex max-w-5xl flex-col gap-12">
-        <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: 'easeOut' }}
-          className="flex flex-col gap-3"
-        >
-          <Link href="/" className="text-xs tracking-[0.3em] opacity-50 hover:opacity-100">
-            ← 回 首 页
-          </Link>
-          <h1 className="font-master text-3xl tracking-[0.3em] sm:text-4xl">
-            你 想 让 先 生 替 你 写 给 谁?
-          </h1>
-          <p className="text-sm tracking-widest opacity-60">
-            选一种笔法。先生会按这个口气,替你落笔。
-          </p>
-        </motion.div>
-
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-          {STYLE_ORDER.map((key, i) => (
-            <StyleCard key={key} def={STYLES[key]} index={i} />
-          ))}
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1.4, delay: 0.8 }}
-          className="mt-8 text-center text-[11px] tracking-[0.35em] opacity-45"
-        >
-          四种笔法 · 一种心事
-        </motion.div>
-      </div>
-    </PaperBackground>
-  );
+  return <StylesClient />;
 }

@@ -30,12 +30,12 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
 
   const showRedSeal = styleKey !== 'remembrance';
 
-  const padX = compact ? 28 : 56;
-  const padY = compact ? 40 : 64;
-  const fontPx = compact ? 15 : 18;
-  const maxBodyH = compact ? 380 : 480;
-  const sealSize = compact ? 64 : styleKey === 'remembrance' ? 100 : 80;
-  const sigGap = compact ? 10 : 14;
+  const padX = compact ? 22 : 48;
+  const padY = compact ? 26 : 56;
+  const fontPx = compact ? 14 : 17;
+  const maxBodyH = compact ? 240 : 440;
+  const sealSize = compact ? 48 : styleKey === 'remembrance' ? 92 : 72;
+  const sigGap = compact ? 6 : 12;
 
   return (
     <div className="flex w-full justify-center">
@@ -56,8 +56,8 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
           padding: `${padY}px ${padX}px`,
           width: 'max-content',
           maxWidth: 'min(820px, calc(100vw - 24px))',
-          minWidth: compact ? 280 : 360,
-          minHeight: compact ? 460 : 560,
+          minWidth: compact ? 260 : 340,
+          minHeight: compact ? 340 : 500,
         }}
       >
         <div
@@ -90,7 +90,7 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
                 key={i}
                 initial={{ opacity: 0, filter: 'blur(4px)' }}
                 animate={revealed ? { opacity: 1, filter: 'blur(0px)' } : { opacity: 0, filter: 'blur(4px)' }}
-                transition={{ duration: 1, delay: 0.4 + i * 0.55, ease: 'easeOut' }}
+                transition={{ duration: 0.55, delay: 0.2 + i * 0.28, ease: 'easeOut' }}
                 className="whitespace-pre-wrap"
                 style={{
                   marginInlineEnd: compact ? '1em' : '1.4em',
@@ -106,7 +106,7 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
           <motion.div
             initial={{ opacity: 0 }}
             animate={revealed ? { opacity: 0.9 } : { opacity: 0 }}
-            transition={{ duration: 0.9, delay: 0.4 + paragraphs.length * 0.55, ease: 'easeOut' }}
+            transition={{ duration: 0.5, delay: 0.25 + paragraphs.length * 0.28, ease: 'easeOut' }}
             className="absolute font-serif"
             style={{
               left: padX,
@@ -128,7 +128,7 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
               ? { opacity: showRedSeal ? 0.92 : 0.7, scale: 1, rotate: showRedSeal ? -8 : 0 }
               : { opacity: 0, scale: 1.6, rotate: 8 }
           }
-          transition={{ duration: 0.45, type: 'spring', stiffness: 220, damping: 14 }}
+          transition={{ duration: 0.32, type: 'spring', stiffness: 260, damping: 16 }}
           className="absolute"
           style={{
             right: padX,

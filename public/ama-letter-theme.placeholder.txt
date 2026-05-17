@@ -1,0 +1,6 @@
+Place licensed background music at:
+
+public/ama-letter-theme.mp3
+
+The app loads /ama-letter-theme.mp3 asynchronously when available. If the file is
+not present, it falls back to a lightweight original WebAudio ambience.

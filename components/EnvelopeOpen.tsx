@@ -11,7 +11,7 @@ interface EnvelopeOpenProps {
 export function EnvelopeOpen({ open, onDone }: EnvelopeOpenProps) {
   useEffect(() => {
     if (!open) return;
-    const timer = setTimeout(onDone, 3400);
+    const timer = setTimeout(onDone, 2200);
     return () => clearTimeout(timer);
   }, [open, onDone]);
 
@@ -21,7 +21,7 @@ export function EnvelopeOpen({ open, onDone }: EnvelopeOpenProps) {
         <motion.div
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.35 }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-paper px-6"
           style={{
             backgroundImage: `
@@ -35,7 +35,7 @@ export function EnvelopeOpen({ open, onDone }: EnvelopeOpenProps) {
             <motion.div
               initial={{ y: 60, opacity: 0, rotate: -2 }}
               animate={{ y: 0, opacity: 1, rotate: 0 }}
-              transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
               className="absolute inset-0"
             >
               <svg
@@ -82,7 +82,7 @@ export function EnvelopeOpen({ open, onDone }: EnvelopeOpenProps) {
               <motion.div
                 initial={{ rotateX: 0 }}
                 animate={{ rotateX: -170 }}
-                transition={{ duration: 1.2, delay: 1.0, ease: [0.6, 0, 0.4, 1] }}
+                transition={{ duration: 0.7, delay: 0.55, ease: [0.6, 0, 0.4, 1] }}
                 className="absolute"
                 style={{
                   top: 0,
@@ -107,7 +107,7 @@ export function EnvelopeOpen({ open, onDone }: EnvelopeOpenProps) {
               <motion.div
                 initial={{ y: 0, opacity: 0 }}
                 animate={{ y: -120, opacity: 1 }}
-                transition={{ duration: 1.0, delay: 2.0, ease: [0.16, 1, 0.3, 1] }}
+                transition={{ duration: 0.65, delay: 1.2, ease: [0.16, 1, 0.3, 1] }}
                 className="absolute bg-paper shadow-[0_8px_30px_-12px_rgba(60,40,20,0.45)]"
                 style={{
                   left: '12%',
@@ -134,7 +134,7 @@ export function EnvelopeOpen({ open, onDone }: EnvelopeOpenProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, delay: 0.6 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
             className="absolute bottom-16 text-center text-[11px] tracking-[0.4em] opacity-55"
           >
             <span>有 人 给 你 寄 了 一 封 侨 批</span>

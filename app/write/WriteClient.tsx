@@ -7,6 +7,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { GeneratingModal } from '@/components/GeneratingModal';
 import { PaperBackground } from '@/components/PaperBackground';
 import { recordHistory } from '@/lib/history';
+import { normalizeRemittanceAmount } from '@/lib/remittance';
 import { DEFAULT_PROMPTS, isStyleKey, RECIPIENTS, STYLES, type DefaultPrompt } from '@/lib/styles';
 
 const PLACEHOLDER =
@@ -23,6 +24,7 @@ export function WriteClient() {
   const [recipientName, setRecipientName] = useState('');
   const [senderName, setSenderName] = useState('');
   const [withMoney, setWithMoney] = useState(false);
+  const [remittanceAmount, setRemittanceAmount] = useState('50');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeDefault, setActiveDefault] = useState<string | null>(null);
@@ -45,7 +47,10 @@ export function WriteClient() {
   const handleDefault = (preset: DefaultPrompt) => {
     setText(preset.text);
     if (preset.recipient) setRecipient(preset.recipient);
-    if (def.key !== 'remembrance') setWithMoney(preset.withMoney);
+    if (def.key !== 'remembrance') {
+      setWithMoney(preset.withMoney);
+      if (preset.withMoney) setRemittanceAmount('50');
+    }
     setActiveDefault(preset.key);
     setError(null);
   };
@@ -74,6 +79,8 @@ export function WriteClient() {
     setError(null);
     setPendingConfirm(false);
     setLoading(true);
+    const normalizedRemittanceAmount =
+      def.key !== 'remembrance' && withMoney ? normalizeRemittanceAmount(remittanceAmount) : null;
     try {
       const res = await fetch('/api/generate', {
         method: 'POST',
@@ -82,6 +89,7 @@ export function WriteClient() {
           style: def.key,
           userInput: text,
           withMoney: def.key === 'remembrance' ? false : withMoney,
+          remittanceAmount: normalizedRemittanceAmount,
           recipient: rec,
           recipientName: rname,
           senderName: sname,
@@ -107,12 +115,15 @@ export function WriteClient() {
         : Math.random().toString(36).slice(2, 10);
       const body = data.letter as string;
       const signature = data.signature as string;
+      const savedRemittanceAmount =
+        typeof data.remittanceAmount === 'number' ? normalizeRemittanceAmount(data.remittanceAmount) : null;
       sessionStorage.setItem(
         `qiaopi:letter:${id}`,
         JSON.stringify({
           style: def.key,
           body,
           signature,
+          remittanceAmount: savedRemittanceAmount,
           ts: Date.now(),
         })
       );
@@ -269,30 +280,62 @@ export function WriteClient() {
           </div>
 
           {def.key !== 'remembrance' && (
-            <label className="flex items-center justify-between border border-ink/20 px-5 py-4 text-sm">
-              <span className="flex flex-col gap-1">
-                <span className="tracking-widest">是 否 寄「银 两」</span>
-                <span className="text-[11px] tracking-wider opacity-55">
-                  开启后,先生会在信中附一句寄钱的话,沿用旧时银信合一的传统。
+            <div className="flex flex-col gap-4 border border-ink/20 px-5 py-4 text-sm">
+              <div className="flex items-center justify-between gap-5">
+                <span className="flex flex-col gap-1">
+                  <span className="tracking-widest">是 否 寄「银 两」</span>
+                  <span className="text-[11px] tracking-wider opacity-55">
+                    开启后,先生会在信中附一句寄钱的话,沿用旧时银信合一的传统。
+                  </span>
                 </span>
-              </span>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={withMoney}
-                onClick={() => setWithMoney((v) => !v)}
-                className="relative h-6 w-12 border border-ink/40 transition-colors"
-                style={{ backgroundColor: withMoney ? '#1a1a1a' : 'transparent' }}
-              >
-                <span
-                  className="absolute top-0.5 h-4 w-4 transition-all"
-                  style={{
-                    left: withMoney ? 26 : 2,
-                    backgroundColor: withMoney ? '#f4ecd8' : '#1a1a1a',
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={withMoney}
+                  onClick={() => {
+                    setWithMoney((v) => !v);
+                    if (!withMoney && !remittanceAmount.trim()) setRemittanceAmount('50');
                   }}
-                />
-              </button>
-            </label>
+                  className="relative h-6 w-12 shrink-0 border border-ink/40 transition-colors"
+                  style={{ backgroundColor: withMoney ? '#1a1a1a' : 'transparent' }}
+                >
+                  <span
+                    className="absolute top-0.5 h-4 w-4 transition-all"
+                    style={{
+                      left: withMoney ? 26 : 2,
+                      backgroundColor: withMoney ? '#f4ecd8' : '#1a1a1a',
+                    }}
+                  />
+                </button>
+              </div>
+
+              {withMoney && (
+                <motion.div
+                  initial={{ opacity: 0, y: -4 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.35 }}
+                  className="flex flex-col gap-2 border-t border-ink/10 pt-4 sm:flex-row sm:items-center sm:justify-between"
+                >
+                  <label htmlFor="remittance-amount" className="text-[11px] tracking-[0.3em] opacity-60">
+                    随 批 寄
+                  </label>
+                  <div className="flex items-center gap-3">
+                    <input
+                      id="remittance-amount"
+                      type="number"
+                      min={1}
+                      max={9999}
+                      inputMode="numeric"
+                      value={remittanceAmount}
+                      onChange={(e) => setRemittanceAmount(e.target.value.replace(/[^\d]/g, '').slice(0, 4))}
+                      onBlur={() => setRemittanceAmount(String(normalizeRemittanceAmount(remittanceAmount)))}
+                      className="w-28 border border-ink/30 bg-transparent px-3 py-2 text-center text-base tracking-widest outline-none transition-colors focus:border-ink"
+                    />
+                    <span className="text-sm tracking-[0.3em] opacity-75">港 纸</span>
+                  </div>
+                </motion.div>
+              )}
+            </div>
           )}
 
           {error && (

@@ -35,6 +35,7 @@ export interface LetterPromptInput {
   style: StyleKey;
   userInput: string;
   withMoney: boolean;
+  remittanceAmount?: number | null;
   recipient: string;
   recipientName?: string;
   senderName?: string;
@@ -44,13 +45,15 @@ export function buildLetterPrompt({
   style,
   userInput,
   withMoney,
+  remittanceAmount,
   recipient,
   recipientName,
   senderName,
 }: LetterPromptInput): string {
   const def = STYLES[style];
+  const moneyAmount = remittanceAmount ?? 50;
   const moneyInstruction = withMoney
-    ? '乡亲想寄一点钱,你在信中自然加一句「随附银二元」「另寄叻币十圆」之类,数额合理简短,不必长。'
+    ? `乡亲要寄港纸 ${moneyAmount} 元。你必须在信中自然写明「随附港纸${moneyAmount}元」或同等意思,不得改成别的金额、币别或另添其他钱数。`
     : '乡亲此次不寄银钱。整封信内不得出现「银」「钱」「圆」「元」「叻币」「关金」「附寄」任何字眼。';
 
   const rec = recipient || '(由风格自行推断)';

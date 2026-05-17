@@ -1,6 +1,7 @@
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
+import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { PaperBackground } from './PaperBackground';
 
@@ -27,7 +28,7 @@ export function GeneratingModal({ open }: GeneratingModalProps) {
     }
     const timer = setInterval(() => {
       setPhase((p) => (p + 1) % PHASES.length);
-    }, 3500);
+    }, 1600);
     return () => clearInterval(timer);
   }, [open]);
 
@@ -38,11 +39,30 @@ export function GeneratingModal({ open }: GeneratingModalProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.25 }}
           className="fixed inset-0 z-50"
         >
           <PaperBackground color="#f4ecd8" className="absolute inset-0" />
-          <div className="relative flex h-full w-full flex-col items-center justify-center gap-12 px-6">
+          <div className="relative flex h-full w-full flex-col items-center justify-center gap-7 px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 10, rotate: -1 }}
+              animate={{ opacity: 1, y: 0, rotate: -0.5 }}
+              transition={{ duration: 0.45, ease: 'easeOut' }}
+              className="relative overflow-hidden border border-ink/15 shadow-[0_10px_34px_-22px_rgba(60,40,20,0.55)]"
+            >
+              <Image
+                src="/send-letter.jpeg"
+                alt="先生替乡亲寄出一封侨批"
+                width={334}
+                height={151}
+                priority
+                className="block h-auto w-[250px] sm:w-[300px]"
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{ boxShadow: 'inset 0 0 42px rgba(80,50,20,0.2)' }}
+              />
+            </motion.div>
             <Brush />
             <AnimatePresence mode="wait">
               <motion.div
@@ -50,7 +70,7 @@ export function GeneratingModal({ open }: GeneratingModalProps) {
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -8 }}
-                transition={{ duration: 0.8 }}
+                transition={{ duration: 0.35 }}
                 className="font-serif text-lg tracking-[0.3em] text-ink"
               >
                 {PHASES[phase]}
@@ -72,8 +92,9 @@ function Brush() {
       xmlns="http://www.w3.org/2000/svg"
       initial={{ rotate: -4, y: -6 }}
       animate={{ rotate: [-4, 6, -4], y: [-6, 4, -6] }}
-      transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+      transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
       aria-hidden
+      className="h-[150px] w-[82px] sm:h-[170px] sm:w-[94px]"
     >
       <rect x="54" y="10" width="12" height="120" rx="3" fill="#3a2a1a" />
       <rect x="50" y="125" width="20" height="14" rx="2" fill="#c9a86a" />
@@ -93,7 +114,7 @@ function Brush() {
         fill="#1a1a1a"
         initial={{ opacity: 0, y: 0 }}
         animate={{ opacity: [0, 0.6, 0], y: [0, 6, 12] }}
-        transition={{ duration: 1.6, repeat: Infinity, delay: 0.6 }}
+        transition={{ duration: 0.9, repeat: Infinity, delay: 0.25 }}
       />
     </motion.svg>
   );

@@ -7,6 +7,7 @@ import {
   detectSelfHarm,
   SELF_HARM_REPLY,
 } from '@/lib/prompts';
+import { normalizeRemittanceAmount } from '@/lib/remittance';
 import { isStyleKey } from '@/lib/styles';
 
 export const runtime = 'nodejs';
@@ -17,6 +18,7 @@ interface GenerateBody {
   style?: unknown;
   userInput?: unknown;
   withMoney?: unknown;
+  remittanceAmount?: unknown;
   recipient?: unknown;
   recipientName?: unknown;
   senderName?: unknown;
@@ -53,7 +55,6 @@ export async function POST(req: Request) {
 
   const style = typeof payload.style === 'string' ? payload.style : '';
   const userInput = typeof payload.userInput === 'string' ? payload.userInput.trim() : '';
-  const withMoney = Boolean(payload.withMoney);
   const recipient = typeof payload.recipient === 'string' ? payload.recipient.trim().slice(0, 10) : '';
   const recipientName = typeof payload.recipientName === 'string' ? payload.recipientName.trim().slice(0, 10) : '';
   const senderName = typeof payload.senderName === 'string' ? payload.senderName.trim().slice(0, 10) : '';
@@ -64,6 +65,8 @@ export async function POST(req: Request) {
       { status: 400 }
     );
   }
+  const withMoney = style !== 'remembrance' && Boolean(payload.withMoney);
+  const remittanceAmount = withMoney ? normalizeRemittanceAmount(payload.remittanceAmount) : null;
   if (!userInput || userInput.length < 4) {
     return NextResponse.json(
       { success: false, blocked: true, blockReason: '话太短了,再多说几句吧。' },
@@ -87,13 +90,21 @@ export async function POST(req: Request) {
     });
   }
 
-  const prompt = buildLetterPrompt({ style, userInput, withMoney, recipient, recipientName, senderName });
+  const prompt = buildLetterPrompt({
+    style,
+    userInput,
+    withMoney,
+    remittanceAmount,
+    recipient,
+    recipientName,
+    senderName,
+  });
 
   let raw = '';
   try {
     raw = await chat({
       messages: [{ role: 'user', content: prompt }],
-      maxTokens: 8000,
+      maxTokens: 1200,
       temperature: 0.65,
       timeoutMs: 50_000,
     });
@@ -140,12 +151,13 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-  await saveLetter({ id, style, body, signature });
+  await saveLetter({ id, style, body, signature, remittanceAmount });
 
   return NextResponse.json({
     success: true,
     id,
     letter: body,
     signature,
+    remittanceAmount,
   });
 }
