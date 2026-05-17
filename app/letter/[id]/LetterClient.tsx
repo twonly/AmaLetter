@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { EnvelopeOpen } from '@/components/EnvelopeOpen';
 import { LetterPaper } from '@/components/LetterPaper';
 import { PaperBackground } from '@/components/PaperBackground';
 import { isStyleKey, STYLES, type StyleKey } from '@/lib/styles';
@@ -20,27 +21,69 @@ export function LetterClient({ id }: { id: string }) {
   const paperRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<Stored | null>(null);
   const [missing, setMissing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [envelopeOpen, setEnvelopeOpen] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [stampDown, setStampDown] = useState(false);
   const [compact, setCompact] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
     const raw = sessionStorage.getItem(`qiaopi:letter:${id}`);
-    if (!raw) {
-      setMissing(true);
-      return;
-    }
-    try {
-      const parsed = JSON.parse(raw) as Stored;
-      if (!isStyleKey(parsed.style) || !parsed.body) {
-        setMissing(true);
-        return;
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw) as Stored;
+        if (isStyleKey(parsed.style) && parsed.body) {
+          setData(parsed);
+          setLoading(false);
+          return () => {
+            cancelled = true;
+          };
+        }
+      } catch {
+        // fall through to API fetch
       }
-      setData(parsed);
-    } catch {
-      setMissing(true);
     }
+    // No sessionStorage match → assume this is a shared link, fetch from server
+    (async () => {
+      try {
+        const res = await fetch(`/api/letter/${encodeURIComponent(id)}`, { cache: 'no-store' });
+        if (cancelled) return;
+        if (!res.ok) {
+          setMissing(true);
+          setLoading(false);
+          return;
+        }
+        const json = (await res.json()) as {
+          success?: boolean;
+          style?: string;
+          body?: string;
+          signature?: string;
+        };
+        if (cancelled) return;
+        if (!json.success || !isStyleKey(json.style ?? '') || !json.body) {
+          setMissing(true);
+          setLoading(false);
+          return;
+        }
+        setData({
+          style: json.style as StyleKey,
+          body: json.body,
+          signature: json.signature ?? '',
+          ts: Date.now(),
+        });
+        setEnvelopeOpen(true);
+        setLoading(false);
+      } catch {
+        if (cancelled) return;
+        setMissing(true);
+        setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   useEffect(() => {
@@ -52,7 +95,7 @@ export function LetterClient({ id }: { id: string }) {
   }, []);
 
   useEffect(() => {
-    if (!data) return;
+    if (!data || envelopeOpen) return;
     const t1 = setTimeout(() => setRevealed(true), 1300);
     const paragraphCount = data.body.split(/\n+/).filter(Boolean).length;
     const stampDelay = 1300 + 400 + paragraphCount * 550 + 900 + 600;
@@ -61,7 +104,7 @@ export function LetterClient({ id }: { id: string }) {
       clearTimeout(t1);
       clearTimeout(t2);
     };
-  }, [data]);
+  }, [data, envelopeOpen]);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -117,14 +160,17 @@ export function LetterClient({ id }: { id: string }) {
       return;
     }
     try {
-      const url = typeof window !== 'undefined' ? window.location.origin : '';
-      const text = `我请先生替我写了一封侨批 · ${url}`;
+      const url = typeof window !== 'undefined' ? window.location.href : '';
       if (navigator.share) {
-        await navigator.share({ title: '先生在等你', text, url });
-        return;
+        try {
+          await navigator.share({ title: '先生在等你', text: '我请先生替你写了一封侨批', url });
+          return;
+        } catch {
+          // fall through to clipboard
+        }
       }
-      await navigator.clipboard.writeText(text);
-      showToast('链接已复制,可贴去小红书。');
+      await navigator.clipboard.writeText(url);
+      showToast('链接已复制,寄给亲人即可打开。');
     } catch (err) {
       showToast('分享失败,先生原谅你。');
     }
@@ -212,6 +258,8 @@ export function LetterClient({ id }: { id: string }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <EnvelopeOpen open={envelopeOpen} onDone={() => setEnvelopeOpen(false)} />
     </PaperBackground>
   );
 }

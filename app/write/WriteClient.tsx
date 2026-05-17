@@ -101,7 +101,9 @@ export function WriteClient() {
         setError(data.blockReason || '先生没能落笔,稍后再试。');
         return;
       }
-      const id = Math.random().toString(36).slice(2, 10);
+      const id = (typeof data.id === 'string' && data.id)
+        ? data.id as string
+        : Math.random().toString(36).slice(2, 10);
       sessionStorage.setItem(
         `qiaopi:letter:${id}`,
         JSON.stringify({

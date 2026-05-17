@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { newLetterId, saveLetter } from '@/lib/db';
 import { chat } from '@/lib/llm';
 import {
   buildLetterPrompt,
@@ -131,9 +132,19 @@ export async function POST(req: Request) {
   }
 
   const { body, signature } = splitBodyAndSignature(raw);
+  const id = newLetterId();
+
+  if (!isStyleKey(style)) {
+    return NextResponse.json(
+      { success: false, blocked: true, blockReason: '风格丢了。' },
+      { status: 500 }
+    );
+  }
+  await saveLetter({ id, style, body, signature });
 
   return NextResponse.json({
     success: true,
+    id,
     letter: body,
     signature,
   });
