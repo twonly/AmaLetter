@@ -1,0 +1,10 @@
+请将本文件替换为 og-image.png(1200x630)。
+
+设计要求:
+- 做旧米黄底(#f4ecd8)
+- 中央一封侨批纸张,带一枚暗红印章
+- 标题"先生在等你"(LXGW WenKai,加粗)
+- 副标题"为现代人代写一封侨批"(Noto Serif SC,小一号)
+- 不要任何 emoji、现代图标、渐变色
+
+可以用 Figma / Photoshop 出图,导出后命名为 og-image.png 替换本文件。
