@@ -76,9 +76,16 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.4, delay: 3.4 }}
+            className="flex flex-col items-center gap-3"
           >
             <Link href="/styles" className="ink-button">
               开 始
+            </Link>
+            <Link
+              href="/letters"
+              className="text-[11px] tracking-[0.35em] opacity-50 transition-opacity hover:opacity-90"
+            >
+              · 看 你 这 些 年 写 过 的 信 ·
             </Link>
           </motion.div>
         </motion.div>

@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { GeneratingModal } from '@/components/GeneratingModal';
 import { PaperBackground } from '@/components/PaperBackground';
+import { recordHistory } from '@/lib/history';
 import { DEFAULT_PROMPTS, isStyleKey, RECIPIENTS, STYLES, type DefaultPrompt } from '@/lib/styles';
 
 const PLACEHOLDER =
@@ -104,15 +105,27 @@ export function WriteClient() {
       const id = (typeof data.id === 'string' && data.id)
         ? data.id as string
         : Math.random().toString(36).slice(2, 10);
+      const body = data.letter as string;
+      const signature = data.signature as string;
       sessionStorage.setItem(
         `qiaopi:letter:${id}`,
         JSON.stringify({
           style: def.key,
-          body: data.letter as string,
-          signature: data.signature as string,
+          body,
+          signature,
           ts: Date.now(),
         })
       );
+      const preview = body.replace(/\s+/g, ' ').slice(0, 40);
+      recordHistory({
+        id,
+        style: def.key,
+        recipient: rec,
+        recipientName: rname,
+        senderName: sname,
+        preview,
+        ts: Date.now(),
+      });
       setText('');
       router.push(`/letter/${id}`);
     } catch (err) {

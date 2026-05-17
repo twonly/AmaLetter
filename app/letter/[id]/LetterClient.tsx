@@ -230,9 +230,12 @@ export function LetterClient({ id }: { id: string }) {
             <Link href="/styles" className="ink-button ghost">
               再 写 一 封
             </Link>
-            <span className="text-[10px] tracking-[0.3em] opacity-50">
-              换 种 笔 法 再 写
-            </span>
+            <Link
+              href="/letters"
+              className="text-[10px] tracking-[0.3em] opacity-50 transition-opacity hover:opacity-90"
+            >
+              换 种 笔 法 再 写 · 或 看 过 往 →
+            </Link>
           </div>
           <div className="flex flex-col items-center gap-2">
             <button type="button" onClick={handleShare} className="ink-button ghost">
