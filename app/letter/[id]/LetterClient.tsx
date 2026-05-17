@@ -22,7 +22,7 @@ export function LetterClient({ id }: { id: string }) {
   const [missing, setMissing] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const [stampDown, setStampDown] = useState(false);
-  const [vertical, setVertical] = useState(false);
+  const [compact, setCompact] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
@@ -44,8 +44,8 @@ export function LetterClient({ id }: { id: string }) {
   }, [id]);
 
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)');
-    const apply = () => setVertical(mq.matches);
+    const mq = window.matchMedia('(max-width: 640px)');
+    const apply = () => setCompact(mq.matches);
     apply();
     mq.addEventListener('change', apply);
     return () => mq.removeEventListener('change', apply);
@@ -137,9 +137,14 @@ export function LetterClient({ id }: { id: string }) {
           <Link href="/styles" className="text-xs tracking-[0.3em] opacity-50 hover:opacity-100">
             ← 再 写 一 封
           </Link>
-          <span className="text-[11px] tracking-[0.3em] opacity-50">
-            由 QClaw 代写 · qclaw.tencent.com
-          </span>
+          <a
+            href="https://qclaw.qq.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[11px] tracking-[0.3em] opacity-50 transition-opacity hover:opacity-100"
+          >
+            由 QClaw 支持 · qclaw.qq.com
+          </a>
         </div>
 
         <motion.div
@@ -154,7 +159,7 @@ export function LetterClient({ id }: { id: string }) {
             signature={data.signature}
             revealed={revealed}
             stampDown={stampDown}
-            vertical={vertical}
+            compact={compact}
           />
         </motion.div>
 

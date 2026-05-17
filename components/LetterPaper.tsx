@@ -11,11 +11,11 @@ interface LetterPaperProps {
   signature: string;
   revealed: boolean;
   stampDown: boolean;
-  vertical: boolean;
+  compact?: boolean;
 }
 
 export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function LetterPaper(
-  { styleKey, body, signature, revealed, stampDown, vertical },
+  { styleKey, body, signature, revealed, stampDown, compact = false },
   ref
 ) {
   const def = STYLES[styleKey];
@@ -45,8 +45,8 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
         `,
         backgroundSize: '7px 7px, 13px 13px, 100% 100%',
         backgroundPosition: '0 0, 4px 6px, 0 0',
-        padding: vertical ? '64px 80px' : '56px 40px',
-        minHeight: vertical ? 560 : undefined,
+        padding: compact ? '40px 28px' : '64px 80px',
+        minHeight: compact ? 480 : 560,
       }}
     >
       <div
@@ -66,11 +66,11 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
       <article
         className="relative font-serif"
         style={{
-          writingMode: vertical ? 'vertical-rl' : 'horizontal-tb',
-          letterSpacing: vertical ? '0.18em' : '0.05em',
-          lineHeight: vertical ? 2.2 : 1.9,
-          fontSize: vertical ? 18 : 17,
-          maxHeight: vertical ? 520 : undefined,
+          writingMode: 'vertical-rl',
+          letterSpacing: '0.18em',
+          lineHeight: 2.2,
+          fontSize: compact ? 15 : 18,
+          maxHeight: compact ? 420 : 520,
         }}
       >
         {paragraphs.map((p, i) => (
@@ -81,9 +81,7 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
             transition={{ duration: 1, delay: 0.4 + i * 0.55, ease: 'easeOut' }}
             className="whitespace-pre-wrap"
             style={{
-              marginInlineEnd: vertical ? '1.4em' : 0,
-              marginBottom: vertical ? 0 : '0.9em',
-              textIndent: vertical ? 0 : '2em',
+              marginInlineEnd: compact ? '1em' : '1.4em',
             }}
           >
             {p}
@@ -97,9 +95,8 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
             transition={{ duration: 0.9, delay: 0.4 + paragraphs.length * 0.55, ease: 'easeOut' }}
             className="whitespace-pre-wrap"
             style={{
-              marginInlineEnd: vertical ? '2em' : 0,
-              marginTop: vertical ? 0 : '1.4em',
-              textAlign: vertical ? 'start' : 'right',
+              marginInlineEnd: compact ? '1.4em' : '2em',
+              textAlign: 'start',
               opacity: 0.9,
             }}
           >
@@ -118,12 +115,12 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
         transition={{ duration: 0.45, type: 'spring', stiffness: 220, damping: 14 }}
         className="absolute"
         style={{
-          left: vertical ? 56 : 36,
-          bottom: vertical ? 56 : 36,
+          left: compact ? 24 : 56,
+          bottom: compact ? 24 : 56,
           mixBlendMode: showRedSeal ? 'multiply' : 'normal',
         }}
       >
-        <Seal style={styleKey} size={styleKey === 'remembrance' ? 110 : 88} />
+        <Seal style={styleKey} size={compact ? 64 : styleKey === 'remembrance' ? 110 : 88} />
       </motion.div>
 
       <div

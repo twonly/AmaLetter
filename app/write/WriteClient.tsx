@@ -25,6 +25,7 @@ export function WriteClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [activeDefault, setActiveDefault] = useState<string | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState(false);
 
   useEffect(() => {
     if (!isStyleKey(styleParam)) {
@@ -48,12 +49,29 @@ export function WriteClient() {
     setError(null);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = () => {
     if (text.trim().length < 4) {
       setError('再多说几句吧,先生才好下笔。');
       return;
     }
+    if (!recipientName.trim() && !senderName.trim()) {
+      setPendingConfirm(true);
+      setError(null);
+      return;
+    }
+    submitWith(recipient, recipientName, senderName);
+  };
+
+  const acceptDefaults = () => {
+    setRecipient('妻子');
+    setRecipientName('淑柔');
+    setSenderName('木生');
+    submitWith('妻子', '淑柔', '木生');
+  };
+
+  const submitWith = async (rec: string, rname: string, sname: string) => {
     setError(null);
+    setPendingConfirm(false);
     setLoading(true);
     try {
       const res = await fetch('/api/generate', {
@@ -63,9 +81,9 @@ export function WriteClient() {
           style: def.key,
           userInput: text,
           withMoney: def.key === 'remembrance' ? false : withMoney,
-          recipient,
-          recipientName,
-          senderName,
+          recipient: rec,
+          recipientName: rname,
+          senderName: sname,
         }),
       });
       const data = await res.json();
@@ -265,6 +283,35 @@ export function WriteClient() {
           {error && (
             <div className="border-l-2 border-seal-red bg-seal-red/5 px-4 py-3 text-sm tracking-wider text-seal-red">
               {error}
+            </div>
+          )}
+
+          {pendingConfirm && (
+            <div className="flex flex-col gap-3 border border-ink/30 bg-paper-warm/40 p-5 text-sm">
+              <p className="leading-relaxed tracking-wide">
+                你没填名字。先生会默认按
+                <span className="mx-1 border-b border-ink/50 px-1 font-master">写 给 妻 子 · 淑 柔</span>
+                ,落款为
+                <span className="mx-1 border-b border-ink/50 px-1 font-master">夫 · 木 生</span>
+                替你写。
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={acceptDefaults}
+                  disabled={loading}
+                  className="ink-button"
+                >
+                  采 用 默 认 继 续
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingConfirm(false)}
+                  className="ink-button ghost"
+                >
+                  我 自 己 填
+                </button>
+              </div>
             </div>
           )}
 

@@ -9,18 +9,18 @@ export default function HomePage() {
   return (
     <PaperBackground
       color="#f4ecd8"
-      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 py-16 text-ink"
+      className="relative flex min-h-screen w-full flex-col overflow-hidden text-ink"
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center pt-10 text-[10px] tracking-[0.6em] opacity-50">
+      <header className="flex items-center justify-center px-6 pt-10 text-[10px] tracking-[0.6em] opacity-50">
         QIAOPI · 侨批
-      </div>
+      </header>
 
-      <div className="relative z-10 flex w-full max-w-4xl flex-col items-center gap-10">
+      <main className="flex flex-1 flex-col items-center justify-center gap-10 px-6 py-12">
         <motion.div
           initial={{ opacity: 0, y: 20, rotate: -1.5 }}
           animate={{ opacity: 1, y: 0, rotate: -0.8 }}
           transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-[680px]"
+          className="relative w-full max-w-[640px]"
         >
           <div className="relative shadow-[0_18px_60px_-30px_rgba(60,40,20,0.55)]">
             <Image
@@ -51,7 +51,7 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.6, delay: 1.6 }}
-            className="font-master text-[2.2rem] tracking-[0.4em] sm:text-[2.8rem]"
+            className="font-master text-[2rem] tracking-[0.4em] sm:text-[2.6rem]"
           >
             先生,在等你。
           </motion.h1>
@@ -60,7 +60,7 @@ export default function HomePage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.4, delay: 2.2 }}
-            className="font-serif text-sm tracking-[0.5em] opacity-70 sm:text-base"
+            className="font-serif text-sm tracking-[0.5em] opacity-70"
           >
             为现代人代写一封侨批
           </motion.p>
@@ -82,13 +82,13 @@ export default function HomePage() {
             </Link>
           </motion.div>
         </motion.div>
-      </div>
+      </main>
 
-      <motion.div
+      <motion.footer
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.8, delay: 4.4 }}
-        className="absolute bottom-8 z-10 flex flex-col items-center gap-2 text-center"
+        className="flex flex-col items-center gap-2 px-6 pb-8 pt-4 text-center"
       >
         <span className="text-[11px] tracking-[0.35em] opacity-50">
           百年前 他替不识字的乡亲写信  ·  百年后 让先生替你写一封
@@ -96,7 +96,15 @@ export default function HomePage() {
         <span className="text-[10px] tracking-[0.4em] opacity-40">
           致 敬 电 影《给 阿 嬷 的 情 书》
         </span>
-      </motion.div>
+        <a
+          href="https://www.xiaohongshu.com/user/profile/6467b1210000000010027a51"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-2 text-[10px] tracking-[0.3em] opacity-40 transition-opacity hover:opacity-80"
+        >
+          意 见 反 馈 · by AI拯救打工人·一个潮汕人
+        </a>
+      </motion.footer>
     </PaperBackground>
   );
 }
