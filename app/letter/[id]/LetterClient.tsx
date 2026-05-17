@@ -105,7 +105,7 @@ export function LetterClient({ id }: { id: string }) {
       link.download = `侨批-${Date.now()}.png`;
       link.href = dataUrl;
       link.click();
-      showToast('已装进信封。');
+      showToast('已保存为图片到下载文件夹。');
     } catch (err) {
       showToast('导出失败,先生稍后再试。');
     }
@@ -162,17 +162,32 @@ export function LetterClient({ id }: { id: string }) {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: stampDown ? 1 : 0, y: stampDown ? 0 : 8 }}
           transition={{ duration: 0.9 }}
-          className="flex flex-wrap items-center justify-center gap-4 pt-2"
+          className="flex flex-wrap items-start justify-center gap-x-8 gap-y-4 pt-2"
         >
-          <button type="button" onClick={handleDownload} className="ink-button">
-            {def.downloadLabel}
-          </button>
-          <Link href="/styles" className="ink-button ghost">
-            再 写 一 封
-          </Link>
-          <button type="button" onClick={handleShare} className="ink-button ghost">
-            {def.shareLabel}
-          </button>
+          <div className="flex flex-col items-center gap-2">
+            <button type="button" onClick={handleDownload} className="ink-button">
+              {def.downloadLabel}
+            </button>
+            <span className="text-[10px] tracking-[0.3em] opacity-50">
+              {def.allowDownload ? '保 存 为 图 片 到 本 地' : '不 下 载,只 留 在 心 里'}
+            </span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <Link href="/styles" className="ink-button ghost">
+              再 写 一 封
+            </Link>
+            <span className="text-[10px] tracking-[0.3em] opacity-50">
+              换 种 笔 法 再 写
+            </span>
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <button type="button" onClick={handleShare} className="ink-button ghost">
+              {def.shareLabel}
+            </button>
+            <span className="text-[10px] tracking-[0.3em] opacity-50">
+              {def.allowDownload ? '复 制 链 接 寄 给 亲 人' : '放 进 抽 屉,不 寄 出'}
+            </span>
+          </div>
         </motion.div>
       </div>
 

@@ -109,16 +109,16 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
       </article>
 
       <motion.div
-        initial={{ opacity: 0, scale: 1.6, rotate: -8 }}
+        initial={{ opacity: 0, scale: 1.6, rotate: 8 }}
         animate={
           stampDown
-            ? { opacity: showRedSeal ? 0.92 : 0.7, scale: 1, rotate: showRedSeal ? -6 : 0 }
-            : { opacity: 0, scale: 1.6, rotate: -8 }
+            ? { opacity: showRedSeal ? 0.92 : 0.7, scale: 1, rotate: showRedSeal ? 6 : 0 }
+            : { opacity: 0, scale: 1.6, rotate: 8 }
         }
         transition={{ duration: 0.45, type: 'spring', stiffness: 220, damping: 14 }}
         className="absolute"
         style={{
-          right: vertical ? 56 : 36,
+          left: vertical ? 56 : 36,
           bottom: vertical ? 56 : 36,
           mixBlendMode: showRedSeal ? 'multiply' : 'normal',
         }}

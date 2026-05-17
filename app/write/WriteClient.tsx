@@ -163,12 +163,12 @@ export function WriteClient() {
               <input
                 value={recipientName}
                 onChange={(e) => setRecipientName(e.target.value.slice(0, 10))}
-                placeholder="如「阿翠」「建国」"
+                placeholder="如「淑柔」「南枝」"
                 maxLength={10}
                 className="w-full border border-ink/30 bg-transparent px-4 py-3 text-sm tracking-widest outline-none transition-colors focus:border-ink"
               />
               <p className="mt-2 text-[10px] tracking-wider opacity-55">
-                填了会出现在抬头,如「阿翠吾妻」「建国父亲膝下」
+                填了会出现在抬头,如「淑柔吾妻」「南枝父亲膝下」
               </p>
             </div>
             <div>
@@ -178,12 +178,12 @@ export function WriteClient() {
               <input
                 value={senderName}
                 onChange={(e) => setSenderName(e.target.value.slice(0, 10))}
-                placeholder="如「阿正」「建华」「长青」"
+                placeholder="如「木生」「狄功」"
                 maxLength={10}
                 className="w-full border border-ink/30 bg-transparent px-4 py-3 text-sm tracking-widest outline-none transition-colors focus:border-ink"
               />
               <p className="mt-2 text-[10px] tracking-wider opacity-55">
-                填了会出现在落款,如「夫 阿正」「儿 建华」「孙 长青」
+                填了会出现在落款,如「夫 木生」「儿 狄功」
               </p>
             </div>
           </div>
