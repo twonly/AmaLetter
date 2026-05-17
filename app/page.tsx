@@ -15,12 +15,12 @@ export default function HomePage() {
         QIAOPI · 侨批
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-8 px-6 py-8 sm:gap-10">
+      <main className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-6 sm:gap-8 sm:py-8">
         <motion.div
           initial={{ opacity: 0, y: 20, rotate: -1.5 }}
           animate={{ opacity: 1, y: 0, rotate: -0.8 }}
           transition={{ duration: 1.6, ease: [0.16, 1, 0.3, 1] }}
-          className="relative w-full max-w-[560px] sm:max-w-[620px]"
+          className="relative w-full max-w-[520px] sm:max-w-[580px]"
         >
           <div className="relative shadow-[0_18px_60px_-30px_rgba(60,40,20,0.55)]">
             <Image
@@ -45,48 +45,70 @@ export default function HomePage() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.4, delay: 1.0, ease: 'easeOut' }}
-          className="flex flex-col items-center gap-5 text-center"
+          className="flex flex-col items-center gap-4 text-center"
         >
           <motion.h1
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1.4, delay: 1.3 }}
-            className="font-master text-[1.8rem] tracking-[0.4em] sm:text-[2.4rem]"
+            className="font-master text-[1.7rem] tracking-[0.35em] sm:text-[2.2rem] sm:tracking-[0.4em]"
           >
-            先生,在等你。
+            先 生 在 等 你 写 信
           </motion.h1>
 
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, delay: 1.8 }}
-            className="font-serif text-sm tracking-[0.5em] opacity-70"
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, delay: 1.7 }}
+            className="relative flex flex-col items-center gap-1.5"
           >
-            为现代人代写一封侨批
-          </motion.p>
+            <div className="relative overflow-hidden border border-ink/15 shadow-[0_6px_24px_-16px_rgba(60,40,20,0.5)]">
+              <Image
+                src="/scribe-scene.jpg"
+                alt="先生在祠堂门口替乡亲代写侨批"
+                width={334}
+                height={151}
+                className="block h-auto w-[220px] sm:w-[260px]"
+              />
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{
+                  background:
+                    'linear-gradient(180deg, transparent 60%, rgba(244, 236, 216, 0.15))',
+                }}
+              />
+            </div>
+            <span className="text-[10px] tracking-[0.4em] opacity-50">
+              先 生 · 替 你 寄 封 信
+            </span>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 2.3 }}
             className="vertical-divider"
-            style={{ height: 40 }}
+            style={{ height: 32 }}
           />
 
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1.2, delay: 2.6 }}
-            className="flex flex-col items-center gap-2"
+            className="flex flex-col items-center gap-4 sm:flex-row sm:gap-5"
           >
             <Link href="/styles" className="ink-button">
-              开 始
+              开 始 写 信
             </Link>
             <Link
               href="/letters"
-              className="text-[11px] tracking-[0.35em] opacity-50 transition-opacity hover:opacity-90"
+              className="ink-button ghost group"
+              aria-label="查看我以前写过的侨批"
             >
-              · 看 你 这 些 年 写 过 的 信 ·
+              我 写 过 的 信
+              <span className="ml-2 inline-block transition-transform group-hover:translate-x-1">
+                →
+              </span>
             </Link>
           </motion.div>
         </motion.div>
@@ -95,7 +117,7 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1.6, delay: 3.2 }}
-          className="mt-2 flex flex-col items-center gap-1.5 text-center"
+          className="mt-1 flex flex-col items-center gap-1.5 text-center"
         >
           <span className="text-[11px] tracking-[0.3em] opacity-55 sm:tracking-[0.35em]">
             百 年 前 他 替 不 识 字 的 乡 亲 写 信
