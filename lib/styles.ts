@@ -28,20 +28,12 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: true,
     downloadLabel: '装进信封',
     shareLabel: '让它漂洋过海',
-    template: `结构(请严格按 8 段写,段与段之间空一行):
-1. 抬头(如"父亲大人膝下"、"兄长台鉴")
-2. 问候(如"敬禀者"、"展信安康")
-3. 报平安(儿在外一切顺遂)
-4. 报近况(工事 / 生意 / 学业,使用旧词)
-5. 说银两(随附 X 元,望以 Y 用之) — 仅当 withMoney 为是
-6. 嘱家事(母亲身体 / 田亩 / 弟妹)
-7. 思念(一句风物寄思,如"南洋雨季又至,木棉花开三回")
-8. 落款(儿 XX 顿首 / 农历某年某月)`,
+    template: `沉稳克制。开头如「父亲大人膝下」「父亲尊前」「兄长台鉴」。落款用「男某手书」「儿某手书」。`,
   },
   maiden: {
     key: 'maiden',
     name: '闺阁守望体',
-    recipient: '母亲 · 奶奶 · 外婆 · 远方的女性长辈',
+    recipient: '母亲 · 妻子 · 奶奶 · 外婆',
     sample: '前夜梦见家中的旧灶,醒来枕席微凉。',
     description: '婉约温情,风物寄思,不直说但句句是。',
     paperColor: '#f4ece8',
@@ -50,14 +42,7 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: true,
     downloadLabel: '装进信封',
     shareLabel: '让它漂洋过海',
-    template: `结构(请严格按 7 段写,段与段之间空一行):
-1. 抬头(如"母亲大人膝下")
-2. 问候(展信安康)
-3. 报平安(儿在外一切尚好)
-4. 报一件小事(具体到一只猫、一道菜、一个梦)
-5. 担心(听说母亲膝痛 / 头晕,望多保重) — 若用户未提及,则换一种贴身的担忧
-6. 一句风物寄思(月、花、雨、海)
-7. 落款(儿 XX 顿首)`,
+    template: `婉约温情。开头如「母亲大人尊前」「妻鉴」「贤妻如晤」「阿嬷膝下」。落款用「儿某手书」「夫某手书」「孙某手书」。`,
   },
   youth: {
     key: 'youth',
@@ -71,19 +56,13 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: true,
     downloadLabel: '装进信封',
     shareLabel: '让它漂洋过海',
-    template: `结构(请严格按 6 段写,段与段之间空一行):
-1. 抬头(如"吾友 XX 兄")
-2. 问候(别来无恙)
-3. 报近况(可稍微吹一下,但要有少年感)
-4. 回忆一件具体的事(共同的回忆)
-5. 约定(他日相见时如何)
-6. 落款(弟 XX 拜上)`,
+    template: `意气、夹少年气。开头如「XX 兄如晤」「吾友 XX 兄」。落款用「弟某拜上」。`,
   },
   remembrance: {
     key: 'remembrance',
     name: '暮年回望体',
     recipient: '已经离开的人 · 走了的亲人 · 不在的宠物 · 远去的青春',
-    sample: '妈,今年的桂花开了,我还是没学会做你那道糖醋鱼。',
+    sample: '阿公,你抱我走过的那条巷子还在,只是窄了好多。',
     description: '平静、回忆、不哭,只是说话。',
     paperColor: '#ececec',
     inkColor: '#4a4a4a',
@@ -91,19 +70,7 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: false,
     downloadLabel: '留在心里',
     shareLabel: '放进抽屉',
-    template: `结构(请严格按 5 段写,段与段之间空一行):
-1. 抬头(简单的称呼,如"妈"、"老李",不用敬辞)
-2. 报近况(说说自己现在的生活,平淡)
-3. 一件想告诉 ta 的事(具体到细节)
-4. 一句不直说的思念
-5. 落款(只有一个名字和日期,没有"顿首"、没有任何敬辞)
-
-特殊说明:
-- 不要写"敬禀者"等敬辞
-- 不要用"顿首"落款
-- 写的不是"信",是"心里话"
-- 平静、不煽情、不直接说"我想你"
-- 可以提到"如果你还在"或"你走的那年"`,
+    template: `平静、不煽情。称呼直接用「妈」「阿公」「老朋友」,不加敬辞,不写「敬禀者」。落款只用「孙 某 + 日期」「儿 某 + 日期」,不写「顿首」「手书」等敬辞。`,
   },
 };
 
@@ -112,3 +79,109 @@ export const STYLE_ORDER: StyleKey[] = ['merchant', 'maiden', 'youth', 'remembra
 export function isStyleKey(value: string | null | undefined): value is StyleKey {
   return value === 'merchant' || value === 'maiden' || value === 'youth' || value === 'remembrance';
 }
+
+export type RecipientKey = 'mom' | 'dad' | 'grandpa' | 'grandma' | 'wife';
+
+export interface RecipientDefinition {
+  key: RecipientKey;
+  label: string;
+  value: string;
+  styleHint: StyleKey;
+}
+
+export const RECIPIENTS: RecipientDefinition[] = [
+  { key: 'mom', label: '妈', value: '妈', styleHint: 'maiden' },
+  { key: 'dad', label: '爸', value: '爸', styleHint: 'merchant' },
+  { key: 'grandpa', label: '阿公', value: '阿公', styleHint: 'merchant' },
+  { key: 'grandma', label: '阿嬷', value: '阿嬷', styleHint: 'maiden' },
+  { key: 'wife', label: '妻子', value: '妻子', styleHint: 'maiden' },
+];
+
+export interface DefaultPrompt {
+  key: string;
+  label: string;
+  recipient: string;
+  withMoney: boolean;
+  text: string;
+}
+
+export const DEFAULT_PROMPTS: Record<StyleKey, DefaultPrompt[]> = {
+  merchant: [
+    {
+      key: 'rickshaw',
+      label: '今日拉了个重客',
+      recipient: '爸',
+      withMoney: true,
+      text: '爸,今天拉三轮车,接了个四百斤的客人,从早到晚累得腰直不起来。不过这一趟多挣了一块钱,够补贴一点家用。我寄一些钱回去,你别舍不得花。',
+    },
+    {
+      key: 'home-affairs',
+      label: '嘱家事,寄一点钱',
+      recipient: '妻子',
+      withMoney: true,
+      text: '家里你辛苦了。我寄一点钱回去,你别再省着用。两个孩子要让他们读书,千万不能让他们去赌。',
+    },
+    {
+      key: 'father-safe',
+      label: '给爸报平安',
+      recipient: '爸',
+      withMoney: false,
+      text: '爸,我这边一切都好,你不要挂念。三餐都有,衣裳也添了。你也注意身体,腿不好别再下地了。',
+    },
+  ],
+  maiden: [
+    {
+      key: 'moonlight',
+      label: '一个人望月',
+      recipient: '妻子',
+      withMoney: false,
+      text: '今晚一个人坐在外面,看着月亮升起来,很亮。想到你那边也能看到同一轮月亮。出来三年了,船上的日子过惯了,你别太挂念。',
+    },
+    {
+      key: 'cloth',
+      label: '买了布料寄回去',
+      recipient: '妈',
+      withMoney: false,
+      text: '妈,今天上街买了些布料,蓝色和米色的,寄回去给你做件新衣裳。冬天到了,你那件旧的也该换换了。',
+    },
+    {
+      key: 'congee',
+      label: '梦见你做的咸菜粥',
+      recipient: '阿嬷',
+      withMoney: false,
+      text: '阿嬷,我这边一切都好,你别担心。这边天冷,你那边也要添衣。前几天梦见你做的咸菜粥。',
+    },
+    {
+      key: 'photo',
+      label: '看到孩子长高了',
+      recipient: '妻子',
+      withMoney: false,
+      text: '看到孩子们的相片,长高了好多,差点不认得了。等再做一阵就回家,看你和孩子。',
+    },
+  ],
+  youth: [
+    {
+      key: 'farewell',
+      label: '别后多年,各奔东西',
+      recipient: '',
+      withMoney: false,
+      text: '老周,十二年没见了吧。前阵子翻到我们高三那张合照,还是当年的样子。哪天回老家,牛肉面店见。',
+    },
+  ],
+  remembrance: [
+    {
+      key: 'grandpa-alley',
+      label: '走了的阿公',
+      recipient: '阿公',
+      withMoney: false,
+      text: '阿公,你走了八年了。我今年终于带儿子回了一趟潮州老家。你抱我走过的那条巷子还在,只是窄了好多。',
+    },
+    {
+      key: 'mom-gone',
+      label: '走了的妈',
+      recipient: '妈',
+      withMoney: false,
+      text: '妈,今年的桂花又开了。我还是没学会你那道糖醋鱼。前几天搬家,翻出你织的那条围巾,我留着了。',
+    },
+  ],
+};

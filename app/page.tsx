@@ -3,19 +3,33 @@
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import { PaperBackground } from '@/components/PaperBackground';
+import { ScribeSilhouette } from '@/components/ScribeSilhouette';
 
 export default function HomePage() {
   return (
-    <PaperBackground color="#f4ecd8" className="relative flex min-h-screen w-full flex-col items-center justify-center px-6 text-ink">
+    <PaperBackground
+      color="#f4ecd8"
+      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden px-6 text-ink"
+    >
       <div className="pointer-events-none absolute inset-x-0 top-0 flex justify-center pt-10 text-[10px] tracking-[0.6em] opacity-50">
         QIAOPI · 侨批
       </div>
 
       <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 0.14, y: 0 }}
+        transition={{ duration: 3, delay: 0.4, ease: 'easeOut' }}
+        className="pointer-events-none absolute right-0 bottom-[8%] w-[min(640px,82vw)] sm:right-[6%]"
+        aria-hidden
+      >
+        <ScribeSilhouette className="h-auto w-full" />
+      </motion.div>
+
+      <motion.div
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 2.4, delay: 1.4, ease: 'easeOut' }}
-        className="flex flex-col items-center gap-8 text-center"
+        className="relative z-10 flex flex-col items-center gap-8 text-center"
       >
         <motion.h1
           initial={{ opacity: 0 }}
@@ -57,9 +71,14 @@ export default function HomePage() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 2.4, delay: 6 }}
-        className="absolute bottom-8 text-[11px] tracking-[0.35em] opacity-50"
+        className="absolute bottom-8 z-10 flex flex-col items-center gap-2 text-center"
       >
-        百年前 他替不识字的乡亲写信  ·  百年后 让先生替你写一封
+        <span className="text-[11px] tracking-[0.35em] opacity-50">
+          百年前 他替不识字的乡亲写信  ·  百年后 让先生替你写一封
+        </span>
+        <span className="text-[10px] tracking-[0.4em] opacity-40">
+          致 敬 电 影《给 阿 嬷 的 情 书》
+        </span>
       </motion.div>
     </PaperBackground>
   );

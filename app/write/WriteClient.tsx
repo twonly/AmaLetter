@@ -6,10 +6,10 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import { GeneratingModal } from '@/components/GeneratingModal';
 import { PaperBackground } from '@/components/PaperBackground';
-import { isStyleKey, STYLES } from '@/lib/styles';
+import { DEFAULT_PROMPTS, isStyleKey, RECIPIENTS, STYLES, type DefaultPrompt } from '@/lib/styles';
 
 const PLACEHOLDER =
-  '先生,你说,我写。\n\n你最近想跟 ta 说什么?家里、工作、想念、愧疚、还是只是想说一声你过得还好。请像聊天一样告诉我,不用润色。';
+  '先生,你说,我写。\n\n你最近想跟 ta 说什么?家里、想念、愧疚,还是只是想说一声你过得还好。\n请像聊天一样告诉我,不用润色。';
 
 const HINT = '提示:越具体越好。一只小时候的猫、一道吃过的菜、一句没说出口的话,都可以告诉先生。';
 
@@ -22,6 +22,7 @@ export function WriteClient() {
   const [withMoney, setWithMoney] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeDefault, setActiveDefault] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isStyleKey(styleParam)) {
@@ -30,8 +31,20 @@ export function WriteClient() {
   }, [styleParam, router]);
 
   const def = useMemo(() => (isStyleKey(styleParam) ? STYLES[styleParam] : null), [styleParam]);
+  const defaults = useMemo(
+    () => (isStyleKey(styleParam) ? DEFAULT_PROMPTS[styleParam] ?? [] : []),
+    [styleParam]
+  );
 
   if (!def) return null;
+
+  const handleDefault = (preset: DefaultPrompt) => {
+    setText(preset.text);
+    if (preset.recipient) setRecipient(preset.recipient);
+    if (def.key !== 'remembrance') setWithMoney(preset.withMoney);
+    setActiveDefault(preset.key);
+    setError(null);
+  };
 
   const handleSubmit = async () => {
     if (text.trim().length < 4) {
@@ -109,20 +122,74 @@ export function WriteClient() {
         >
           <div>
             <label className="mb-2 block text-xs tracking-[0.3em] opacity-60">写 给 谁</label>
+            <div className="mb-3 flex flex-wrap gap-2">
+              {RECIPIENTS.map((r) => {
+                const active = recipient === r.value;
+                return (
+                  <button
+                    key={r.key}
+                    type="button"
+                    onClick={() => setRecipient(active ? '' : r.value)}
+                    className="border px-4 py-1.5 text-sm tracking-[0.3em] transition-colors"
+                    style={{
+                      borderColor: active ? '#1a1a1a' : 'rgba(26,26,26,0.3)',
+                      backgroundColor: active ? '#1a1a1a' : 'transparent',
+                      color: active ? '#f4ecd8' : '#1a1a1a',
+                    }}
+                  >
+                    {r.label}
+                  </button>
+                );
+              })}
+            </div>
             <input
               value={recipient}
               onChange={(e) => setRecipient(e.target.value)}
-              placeholder="妈 / 阿公 / 老李 / 我那只走了的狸花"
+              placeholder="或自己写一个,如「外婆」「老朋友」「我自己」"
               maxLength={20}
               className="w-full border border-ink/30 bg-transparent px-4 py-3 text-sm tracking-widest outline-none transition-colors focus:border-ink"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-xs tracking-[0.3em] opacity-60">你 想 说 的 话</label>
+            <div className="mb-2 flex items-baseline justify-between">
+              <label className="text-xs tracking-[0.3em] opacity-60">你 想 说 的 话</label>
+              {defaults.length > 0 && (
+                <span className="text-[10px] tracking-[0.3em] opacity-45">
+                  ↓ 不知道说什么?点一个填进去
+                </span>
+              )}
+            </div>
+
+            {defaults.length > 0 && (
+              <div className="mb-3 flex flex-wrap gap-2">
+                {defaults.map((p) => {
+                  const active = activeDefault === p.key;
+                  return (
+                    <button
+                      key={p.key}
+                      type="button"
+                      onClick={() => handleDefault(p)}
+                      className="border px-3 py-1.5 text-xs tracking-wider transition-colors"
+                      style={{
+                        borderColor: active ? '#1a1a1a' : 'rgba(26,26,26,0.25)',
+                        backgroundColor: active ? 'rgba(26,26,26,0.06)' : 'transparent',
+                        color: '#1a1a1a',
+                      }}
+                    >
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+
             <textarea
               value={text}
-              onChange={(e) => setText(e.target.value)}
+              onChange={(e) => {
+                setText(e.target.value);
+                if (activeDefault) setActiveDefault(null);
+              }}
               placeholder={PLACEHOLDER}
               maxLength={2000}
               rows={10}
@@ -136,7 +203,7 @@ export function WriteClient() {
               <span className="flex flex-col gap-1">
                 <span className="tracking-widest">是 否 寄「银 两」</span>
                 <span className="text-[11px] tracking-wider opacity-55">
-                  开启后,先生会在信中附一段寄钱的话,沿用旧时银信合一的传统。
+                  开启后,先生会在信中附一句寄钱的话,沿用旧时银信合一的传统。
                 </span>
               </span>
               <button
