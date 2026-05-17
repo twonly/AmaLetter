@@ -184,12 +184,15 @@ export function LetterClient({ id }: { id: string }) {
             ← 再 写 一 封
           </Link>
           <a
-            href="https://qclaw.qq.com"
+            href="https://qclaw.qq.com?channel=6070&share_type=invite-share&invite_code=HnjykQYlfxAZkR92"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[11px] tracking-[0.3em] opacity-50 transition-opacity hover:opacity-100"
+            className="group inline-flex items-baseline gap-1 text-[12px] tracking-[0.25em] text-seal-red transition-all hover:tracking-[0.35em]"
           >
-            由 QClaw 支持 · qclaw.qq.com
+            <span className="font-master">由 </span>
+            <span className="font-master text-[15px] font-semibold underline decoration-seal-red/30 decoration-from-font underline-offset-4 transition-colors group-hover:decoration-seal-red">QClaw</span>
+            <span className="font-master"> 支持</span>
+            <span className="ml-1 text-[10px] tracking-widest opacity-70">qclaw.qq.com →</span>
           </a>
         </div>
 

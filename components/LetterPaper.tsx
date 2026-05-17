@@ -63,8 +63,9 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
         }}
       />
 
+      <div className="relative flex w-full justify-end">
       <article
-        className="relative font-serif"
+        className="font-serif"
         style={{
           writingMode: 'vertical-rl',
           letterSpacing: '0.18em',
@@ -104,6 +105,7 @@ export const LetterPaper = forwardRef<HTMLDivElement, LetterPaperProps>(function
           </motion.p>
         )}
       </article>
+      </div>
 
       <motion.div
         initial={{ opacity: 0, scale: 1.6, rotate: 8 }}
