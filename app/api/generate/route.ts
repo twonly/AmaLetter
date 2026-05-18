@@ -25,21 +25,31 @@ interface GenerateBody {
 }
 
 function splitBodyAndSignature(letter: string): { body: string; signature: string } {
-  const lines = letter.split(/\r?\n/).map((l) => l.trimEnd());
-  while (lines.length && lines[lines.length - 1] === '') lines.pop();
+  // 先过滤掉空行,按非空行处理(模型在抬头/正文/落款之间放不放空行不稳定)
+  const lines = letter
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
   if (lines.length === 0) return { body: '', signature: '' };
+  if (lines.length === 1) return { body: lines[0], signature: '' };
 
-  let cut = lines.length - 1;
-  for (let i = lines.length - 1; i >= Math.max(0, lines.length - 4); i--) {
-    if (lines[i] === '') {
-      cut = i + 1;
-      break;
-    }
+  const last = lines[lines.length - 1];
+  // 落款特征:① 以关系字开头 + 空格/全角空格 + 名字 ② 结尾含敬辞 ③ 含古历日期
+  const SIG_HEAD = /^(夫|儿|孙|弟|男|妹|姐|兄|愚|侄|甥)[\s　]/;
+  const SIG_TAIL = /(顿首|手书|拜上|敬上|拜启|手启|敬启|谨上|某月)$/;
+  const SIG_DATE = /(民国|农历|公元)?(廿|初|某|[一二三四五六七八九十百千]|\d){1,3}年?[一二三四五六七八九十春夏秋冬]+月[初廿一二三四五六七八九十\d]+(日)?$/;
+  const looksLikeSig =
+    last.length <= 30 &&
+    (SIG_HEAD.test(last) || SIG_TAIL.test(last) || SIG_DATE.test(last));
+
+  if (looksLikeSig) {
+    return {
+      body: lines.slice(0, -1).join('\n').trim(),
+      signature: last,
+    };
   }
-  const sig = lines.slice(cut).join('\n').trim();
-  const body = lines.slice(0, cut).join('\n').trim();
-  if (!body) return { body: sig, signature: '' };
-  return { body, signature: sig };
+  // 落款没识别出来:整段当 body,signature 空
+  return { body: lines.join('\n'), signature: '' };
 }
 
 export async function POST(req: Request) {
