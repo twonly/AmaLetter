@@ -107,10 +107,10 @@ export async function POST(req: Request) {
     try {
       raw = await chat({
         messages: [{ role: 'user', content: prompt }],
-        // v4-flash 是推理模型,reasoning 经常吃 500-2000 tokens,留足空间
-        maxTokens: 6000,
+        // no-think 模式下,reasoning 不消耗 tokens,1500 足够 60-160 字侨批
+        maxTokens: 1500,
         temperature: attempt === 1 ? 0.65 : 0.5,
-        timeoutMs: 45_000,
+        timeoutMs: 25_000,
       });
     } catch (err) {
       lastErr = err;
@@ -134,9 +134,9 @@ export async function POST(req: Request) {
   try {
     const verdict = await chat({
       messages: [{ role: 'user', content: buildModerationPrompt(raw) }],
-      maxTokens: 1200,
+      maxTokens: 200,
       temperature: 0,
-      timeoutMs: 10_000,
+      timeoutMs: 8_000,
     });
     if (verdict.toUpperCase().startsWith('BLOCK')) {
       const reason = verdict.split(/[::]/).slice(1).join(':').trim() || '内容未通过审核。';

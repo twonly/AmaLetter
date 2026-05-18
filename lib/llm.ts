@@ -24,14 +24,17 @@ interface ChatOptions {
   temperature?: number;
   timeoutMs?: number;
   signal?: AbortSignal;
+  /** 默认 false:走 no-think。设 true 重新启用 reasoning(慢且贵,正常不用) */
+  think?: boolean;
 }
 
 export async function chat({
   messages,
-  maxTokens = 6000,
+  maxTokens = 1500,
   temperature = 0.85,
-  timeoutMs = 50_000,
+  timeoutMs = 30_000,
   signal,
+  think = false,
 }: ChatOptions): Promise<string> {
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
@@ -44,6 +47,18 @@ export async function chat({
     ? mergeSignals(signal, controller.signal)
     : controller.signal;
 
+  const body: Record<string, unknown> = {
+    model: LETTER_MODEL,
+    messages,
+    max_tokens: maxTokens,
+    temperature,
+    stream: false,
+  };
+  if (!think) {
+    // 关闭 reasoning,reasoning_tokens 归零,延迟降到 1/4 ~ 1/5
+    body.thinking = { type: 'disabled' };
+  }
+
   let res: Response;
   try {
     res = await fetch(`${DEEPSEEK_BASE_URL}/chat/completions`, {
@@ -52,13 +67,7 @@ export async function chat({
         'Content-Type': 'application/json',
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: LETTER_MODEL,
-        messages,
-        max_tokens: maxTokens,
-        temperature,
-        stream: false,
-      }),
+      body: JSON.stringify(body),
       signal: composedSignal,
     });
   } finally {
