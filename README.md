@@ -27,8 +27,6 @@ AmaLetter 是一个中文 AI 侨批生成器，也叫「先生」。它致敬电
 
 ![侨批分享卡片](public/og-image.png)
 
-![代笔先生场景](public/scribe-scene.jpg)
-
 ## 技术栈
 
 - Next.js 14 App Router + TypeScript
@@ -91,16 +89,6 @@ pnpm typecheck  # TypeScript 检查
 
 `app/api/generate` 当前以 60 秒函数时长为边界，生成调用本身会在较短时间内超时并重试一次。若更换慢模型，需同步调整函数时长与前端等待提示。
 
-## SEO 与分享
-
-这个项目的 SEO 目标不是堆词，而是让搜索引擎看懂它是一间「AI 侨批代笔铺」。
-
-- 首页元信息覆盖「侨批生成器」「给阿嬷的情书」「AI 代写侨批」等核心查询。
-- 页面内保留与侨批文化、华侨家书、南洋侨批相关的自然文本。
-- Open Graph 图片使用 `public/og-image.png`，尺寸为 1200 x 630。
-- `sitemap.xml` 与 `robots.txt` 由 Next.js 路由生成。
-- 结构化数据使用 `WebSite` 与 `WebApplication`，便于搜索引擎理解站点用途。
-
 ## 隐私与安全
 
 - 真实 API key 只应存在于 `.env.local` 或 Vercel 环境变量中。
@@ -110,12 +98,6 @@ pnpm typecheck  # TypeScript 检查
 - Supabase service role key 仅在服务端使用，不能放入 `NEXT_PUBLIC_*`。
 - 用户输入会保存到 Supabase，用于分享链接、来源统计与后续质量分析；如果不配置 Supabase，信件只在当前浏览器会话内可用。
 - 自伤风险文本会走关怀页，不进入常规生成流程。
-
-## 素材说明
-
-`public/ama-letter-theme.mp3` 是背景音乐文件。若要使用电影《给阿嬷的情书》的主题曲，请确认授权后替换该文件；代码会异步加载音乐，不阻塞写信与分享。
-
-视觉素材放在 `public/` 下，README 中展示的几张图也来自这里。替换图片时尽量保留同名文件，避免影响分享卡片与文档展示。
 
 ## 目录结构
 
