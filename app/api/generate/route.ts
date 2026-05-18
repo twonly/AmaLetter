@@ -101,26 +101,34 @@ export async function POST(req: Request) {
   });
 
   let raw = '';
-  try {
-    raw = await chat({
-      messages: [{ role: 'user', content: prompt }],
-      maxTokens: 1200,
-      temperature: 0.65,
-      timeoutMs: 50_000,
-    });
-  } catch (err) {
-    console.error('generation failed', err);
-    return NextResponse.json(
-      { success: false, blocked: true, blockReason: '笔墨不顺,稍后再试。' },
-      { status: 502 }
-    );
+  let lastErr: unknown = null;
+  // 推理模型 reasoning tokens 不可控,空内容自动重试一次再放弃
+  for (let attempt = 1; attempt <= 2; attempt++) {
+    try {
+      raw = await chat({
+        messages: [{ role: 'user', content: prompt }],
+        // v4-flash 是推理模型,reasoning 经常吃 500-2000 tokens,留足空间
+        maxTokens: 6000,
+        temperature: attempt === 1 ? 0.65 : 0.5,
+        timeoutMs: 45_000,
+      });
+    } catch (err) {
+      lastErr = err;
+      console.error(`generate attempt ${attempt} threw`, err);
+      raw = '';
+    }
+    if (raw && raw.length >= 20) break;
+    console.warn(`generate attempt ${attempt} empty/short content, len=${raw.length}`);
   }
 
-  if (!raw) {
-    return NextResponse.json(
-      { success: false, blocked: true, blockReason: '先生写到一半,卡住了。' },
-      { status: 502 }
-    );
+  if (!raw || raw.length < 20) {
+    console.error('generate gave up after retries', { lastErr, len: raw.length });
+    // 关键:返 200,避免 Cloudflare 把 5xx body 替换成纯文本错误页
+    return NextResponse.json({
+      success: false,
+      blocked: true,
+      blockReason: '先生今日笔墨不顺,稍后再试一次。',
+    });
   }
 
   try {
