@@ -34,18 +34,38 @@ export interface StoredLetter {
   body: string;
   signature: string;
   remittanceAmount?: number | null;
+  userInput?: string | null;
+  meta?: Record<string, unknown> | null;
 }
 
 export async function saveLetter(letter: StoredLetter): Promise<boolean> {
   const db = getSupabase();
   if (!db) return false;
-  const { error } = await db.from('letters').insert({
+  const row: Record<string, unknown> = {
     id: letter.id,
     style: letter.style,
     body: letter.body,
     signature: packRemittanceSignature(letter.signature, letter.remittanceAmount),
-  });
+  };
+  if (letter.userInput) row.user_input = letter.userInput.slice(0, 2000);
+  if (letter.meta && Object.keys(letter.meta).length > 0) row.meta = letter.meta;
+  const { error } = await db.from('letters').insert(row);
   if (error) {
+    // 若 user_input / meta 列还没建出来,降级到原最小集再试一次,不影响主流程
+    if (/column .*(user_input|meta)/i.test(error.message)) {
+      console.warn('letters table missing user_input/meta columns, falling back', error.message);
+      const fallback = await db.from('letters').insert({
+        id: row.id,
+        style: row.style,
+        body: row.body,
+        signature: row.signature,
+      });
+      if (fallback.error) {
+        console.warn('supabase fallback insert failed', fallback.error.message);
+        return false;
+      }
+      return true;
+    }
     console.warn('supabase insert failed', error.message);
     return false;
   }

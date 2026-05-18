@@ -15,6 +15,41 @@ const PLACEHOLDER =
 
 const HINT = '提示:越具体越好。一只小时候的猫、一道吃过的菜、一句没说出口的话,都可以告诉先生。';
 
+function collectClientMeta(): { ref?: string; ua_class?: string; utm?: Record<string, string> } {
+  if (typeof window === 'undefined') return {};
+  try {
+    const out: { ref?: string; ua_class?: string; utm?: Record<string, string> } = {};
+    const ref = document.referrer || '';
+    if (ref) out.ref = ref.slice(0, 200);
+
+    const params = new URL(window.location.href).searchParams;
+    const utm: Record<string, string> = {};
+    for (const k of ['source', 'medium', 'campaign', 'content', 'term']) {
+      const v = params.get(`utm_${k}`);
+      if (v) utm[k] = v.slice(0, 50);
+    }
+    // 也兼容小红书 / 微信 那种自带的非 utm_ 参数
+    for (const k of ['xhs_source', 'channel', 'from']) {
+      const v = params.get(k);
+      if (v && !utm[k]) utm[k] = v.slice(0, 50);
+    }
+    if (Object.keys(utm).length > 0) out.utm = utm;
+
+    const ua = navigator.userAgent;
+    let cls = 'desktop';
+    if (/MicroMessenger/i.test(ua)) cls = /iPhone|iPad/.test(ua) ? 'ios/wechat' : /Android/.test(ua) ? 'android/wechat' : 'wechat';
+    else if (/iPhone|iPad/.test(ua)) cls = 'ios/safari';
+    else if (/Android/.test(ua)) cls = 'android';
+    else if (/Macintosh/.test(ua)) cls = 'mac';
+    else if (/Windows/.test(ua)) cls = 'windows';
+    out.ua_class = cls;
+
+    return out;
+  } catch {
+    return {};
+  }
+}
+
 export function WriteClient() {
   const router = useRouter();
   const params = useSearchParams();
@@ -82,6 +117,7 @@ export function WriteClient() {
     const normalizedRemittanceAmount =
       def.key !== 'remembrance' && withMoney ? normalizeRemittanceAmount(remittanceAmount) : null;
     try {
+      const meta = collectClientMeta();
       const res = await fetch('/api/generate', {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
@@ -93,6 +129,7 @@ export function WriteClient() {
           recipient: rec,
           recipientName: rname,
           senderName: sname,
+          meta,
         }),
       });
       const data = await res.json();

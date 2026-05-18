@@ -22,6 +22,45 @@ interface GenerateBody {
   recipient?: unknown;
   recipientName?: unknown;
   senderName?: unknown;
+  meta?: unknown;
+}
+
+function safeString(v: unknown, max: number): string | undefined {
+  if (typeof v !== 'string') return undefined;
+  const trimmed = v.trim();
+  if (!trimmed) return undefined;
+  return trimmed.slice(0, max);
+}
+
+function buildMeta(req: Request, clientMeta: unknown): Record<string, unknown> {
+  const out: Record<string, unknown> = {};
+  // 客户端注入(WriteClient 收集的 referrer / utm / ua_class)
+  if (clientMeta && typeof clientMeta === 'object') {
+    const m = clientMeta as Record<string, unknown>;
+    const ref = safeString(m.ref, 200);
+    if (ref) out.ref = ref;
+    const uaClass = safeString(m.ua_class, 40);
+    if (uaClass) out.ua_class = uaClass;
+    if (m.utm && typeof m.utm === 'object') {
+      const utm: Record<string, string> = {};
+      for (const [k, v] of Object.entries(m.utm as Record<string, unknown>)) {
+        const val = safeString(v, 50);
+        if (val) utm[k.slice(0, 20)] = val;
+      }
+      if (Object.keys(utm).length > 0) out.utm = utm;
+    }
+  }
+  // 服务端兜底:Vercel geo + request referer
+  const h = req.headers;
+  const country = h.get('x-vercel-ip-country');
+  if (country) out.country = country.slice(0, 4);
+  const region = h.get('x-vercel-ip-country-region');
+  if (region) out.region = region.slice(0, 8);
+  if (!out.ref) {
+    const serverRef = h.get('referer');
+    if (serverRef) out.ref = serverRef.slice(0, 200);
+  }
+  return out;
 }
 
 function splitBodyAndSignature(letter: string): { body: string; signature: string } {
@@ -169,7 +208,8 @@ export async function POST(req: Request) {
       { status: 500 }
     );
   }
-  await saveLetter({ id, style, body, signature, remittanceAmount });
+  const meta = buildMeta(req, payload.meta);
+  await saveLetter({ id, style, body, signature, remittanceAmount, userInput, meta });
 
   return NextResponse.json({
     success: true,
