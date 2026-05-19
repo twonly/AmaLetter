@@ -28,7 +28,7 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: true,
     downloadLabel: '装进信封',
     shareLabel: '让它漂洋过海',
-    template: `沉稳克制。开头如「父亲大人膝下」「父亲尊前」「兄长台鉴」。落款用「男某手书」「儿某手书」。`,
+    template: `沉稳克制,文白相间。语气适合给男性长辈或正式关系。具体抬头/落款按【收件人关系】决定,不要套默认值。`,
   },
   maiden: {
     key: 'maiden',
@@ -42,7 +42,7 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: true,
     downloadLabel: '装进信封',
     shareLabel: '让它漂洋过海',
-    template: `婉约温情。开头如「母亲大人尊前」「妻鉴」「贤妻如晤」「阿嬷膝下」。落款用「儿某手书」「夫某手书」「孙某手书」。`,
+    template: `婉约温情,风物寄思,情感不直白。语气适合给女性亲人/伴侣/恋人。具体抬头/落款按【收件人关系】决定,不要套默认值。`,
   },
   youth: {
     key: 'youth',
@@ -56,7 +56,7 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: true,
     downloadLabel: '装进信封',
     shareLabel: '让它漂洋过海',
-    template: `意气、夹少年气。开头如「XX 兄如晤」「吾友 XX 兄」。落款用「弟某拜上」。`,
+    template: `意气、夹少年气,旧白话夹文言。适合给同龄人 / 朋友 / 同学 / 恋人 / 兄弟姐妹。**不要默认套兄弟相称**,具体抬头/落款按【收件人关系】决定。给女朋友/未婚妻时,自己绝不自称「弟」,落款只用名字+「手书」。`,
   },
   remembrance: {
     key: 'remembrance',
@@ -70,7 +70,7 @@ export const STYLES: Record<StyleKey, StyleDefinition> = {
     allowDownload: false,
     downloadLabel: '留在心里',
     shareLabel: '放进抽屉',
-    template: `平静、不煽情。称呼直接用「妈」「阿公」「老朋友」,不加敬辞,不写「敬禀者」。落款只用「孙 某 + 日期」「儿 某 + 日期」,不写「顿首」「手书」等敬辞。`,
+    template: `平静、不煽情。给已经离开的人。称呼直接用名字或简单的「妈」「阿公」「老张」「小桐」(不加敬辞,不写「敬禀者」)。落款只用「{自己关系或名字} + 日期」,不写「顿首」「手书」「敬上」等敬辞。**自己跟对方的关系按【收件人关系】决定**:写已故配偶/恋人不要套孙/儿。`,
   },
 };
 
