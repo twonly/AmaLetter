@@ -169,6 +169,7 @@ export function LetterClient({ id }: { id: string }) {
   const [stampDown, setStampDown] = useState(false);
   const [compact, setCompact] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [savePreview, setSavePreview] = useState<string | null>(null);
   const [wechatShareUrl, setWechatShareUrl] = useState<string | null>(null);
   const [remittanceNoticeOpen, setRemittanceNoticeOpen] = useState(false);
   const [queuedRemittanceNotice, setQueuedRemittanceNotice] = useState(false);
@@ -298,20 +299,57 @@ export function LetterClient({ id }: { id: string }) {
     const node = paperRef.current;
     if (!node) return;
     setDownloadBusy(true);
+
+    // 检测能否真的触发文件下载: 微信、iOS Safari 都不支持 <a download>
+    const ua = typeof navigator !== 'undefined' ? navigator.userAgent : '';
+    const isIOS = /iPhone|iPad|iPod/.test(ua);
+    const noDirectDownload = isWeChat() || isIOS;
+
     try {
-      const { toPng } = await import('html-to-image');
-      const dataUrl = await toPng(node, {
+      // 1) 字体没加载完就截图,文字会糊或丢字
+      if (typeof document !== 'undefined' && document.fonts && document.fonts.ready) {
+        await document.fonts.ready;
+      }
+
+      const lib = await import('html-to-image');
+      const baseOpts = {
         quality: 0.95,
-        pixelRatio: 3,
+        // pixelRatio 3 在 iOS 上常导致 data URL 超过 6MB 直接挂掉,降到 2
+        pixelRatio: 2,
         backgroundColor: def.paperColor,
         cacheBust: true,
-      });
-      const link = document.createElement('a');
-      link.download = `侨批-${Date.now()}.png`;
-      link.href = dataUrl;
-      link.click();
-      showToast('已保存为图片到下载文件夹。');
+        // 字体/图 CORS 失败时给个透明占位,不阻断整张图
+        imagePlaceholder:
+          'data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==',
+      } as const;
+
+      let dataUrl = '';
+      try {
+        dataUrl = await lib.toPng(node, baseOpts);
+      } catch (pngErr) {
+        // PNG 失败时降级到 JPEG (体积更小,更兼容)
+        console.warn('toPng failed, falling back to toJpeg', pngErr);
+        dataUrl = await lib.toJpeg(node, { ...baseOpts, quality: 0.92 });
+      }
+
+      if (!dataUrl) throw new Error('empty dataUrl');
+
+      if (noDirectDownload) {
+        // 微信 / iOS: 弹出大图,引导长按保存(浏览器/微信里唯一能成功保存的路径)
+        setSavePreview(dataUrl);
+      } else {
+        // 桌面 / Android Chrome: 走标准下载链接
+        const link = document.createElement('a');
+        link.download = `侨批-${Date.now()}.png`;
+        link.href = dataUrl;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        showToast('已保存为图片到下载文件夹。');
+      }
     } catch (err) {
+      // 真实错误打到 console,便于在 DevTools / Vercel 日志里查
+      console.error('letter export failed', err);
       showToast('导出失败,先生稍后再试。');
     } finally {
       setDownloadBusy(false);
@@ -517,6 +555,45 @@ export function LetterClient({ id }: { id: string }) {
           }
         }}
       />
+
+      <AnimatePresence>
+        {savePreview && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[60] flex flex-col items-center justify-center bg-ink/85 px-5 py-8 backdrop-blur-sm"
+            onClick={() => setSavePreview(null)}
+          >
+            <motion.div
+              initial={{ y: 16, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.35, ease: 'easeOut' }}
+              className="flex max-h-full max-w-full flex-col items-center gap-3"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="text-center text-[12px] tracking-[0.35em] text-paper/90">
+                长 按 图 片 · 保 存 到 相 册
+              </div>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={savePreview}
+                alt="侨批"
+                className="max-h-[72vh] w-auto max-w-full select-none border border-paper/20 shadow-[0_18px_50px_-20px_rgba(0,0,0,0.6)]"
+                draggable={false}
+              />
+              <button
+                type="button"
+                onClick={() => setSavePreview(null)}
+                className="mt-2 border border-paper/40 px-5 py-1.5 text-[11px] tracking-[0.35em] text-paper/90 transition-colors hover:bg-paper/10"
+              >
+                收 起
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </PaperBackground>
   );
 }
