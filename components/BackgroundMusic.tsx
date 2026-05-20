@@ -30,7 +30,7 @@ export function BackgroundMusic() {
   const enabledRef = useRef(true);
   const startingRef = useRef(false);
   const playingRef = useRef(false);
-  const themeAvailableRef = useRef<boolean | null>(null);
+  const [audible, setAudible] = useState(false);
 
   useEffect(() => {
     try {
@@ -54,6 +54,7 @@ export function BackgroundMusic() {
   const stopAll = useCallback(() => {
     playingRef.current = false;
     startingRef.current = false;
+    setAudible(false);
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
@@ -69,16 +70,16 @@ export function BackgroundMusic() {
     }
   }, []);
 
-  const checkThemeFile = useCallback(async () => {
-    if (themeAvailableRef.current !== null) return themeAvailableRef.current;
-    try {
-      const res = await fetch(THEME_SRC, { method: 'HEAD', cache: 'force-cache' });
-      const type = res.headers.get('content-type') ?? '';
-      themeAvailableRef.current = res.ok && type.startsWith('audio/');
-    } catch {
-      themeAvailableRef.current = false;
+  const getThemeAudio = useCallback(() => {
+    const audio = audioRef.current ?? new Audio(THEME_SRC);
+    audio.loop = true;
+    audio.preload = 'auto';
+    audio.volume = 0.32;
+    if (!audioRef.current) {
+      audioRef.current = audio;
+      audio.load();
     }
-    return themeAvailableRef.current;
+    return audio;
   }, []);
 
   const playNote = useCallback((ctx: AudioContext, master: GainNode, step: number) => {
@@ -125,6 +126,7 @@ export function BackgroundMusic() {
     masterRef.current = master;
     if (ctx.state === 'suspended') await ctx.resume();
     playingRef.current = true;
+    setAudible(true);
     playNote(ctx, master, stepRef.current++);
     timerRef.current = window.setInterval(() => {
       if (!contextRef.current || !masterRef.current || !enabledRef.current) return;
@@ -135,34 +137,28 @@ export function BackgroundMusic() {
   const startMusic = useCallback(async () => {
     if (!enabledRef.current || playingRef.current || startingRef.current) return;
     startingRef.current = true;
-    const hasTheme = await checkThemeFile();
-    if (!enabledRef.current) {
-      startingRef.current = false;
-      return;
-    }
-
-    if (hasTheme) {
-      const audio = audioRef.current ?? new Audio(THEME_SRC);
-      audioRef.current = audio;
-      audio.loop = true;
-      audio.preload = 'none';
-      audio.volume = 0.32;
-      try {
-        await audio.play();
-        playingRef.current = true;
-        startingRef.current = false;
-        return;
-      } catch {
-        // Autoplay can fail before user interaction. Fall back to WebAudio on gesture.
-      }
-    }
-
+    const audio = getThemeAudio();
     try {
-      await startSynth();
+      await audio.play();
+      playingRef.current = true;
+      setAudible(true);
+      return;
+    } catch (err) {
+      const name = err instanceof DOMException ? err.name : '';
+      if (name === 'NotAllowedError') {
+        // Browser autoplay policy blocks audible media until the first gesture.
+        return;
+      }
+      console.warn('background music file failed, falling back to synth ambience', err);
+      try {
+        await startSynth();
+      } catch (synthErr) {
+        console.warn('background music fallback failed', synthErr);
+      }
     } finally {
       startingRef.current = false;
     }
-  }, [checkThemeFile, startSynth]);
+  }, [getThemeAudio, startSynth]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -176,25 +172,42 @@ export function BackgroundMusic() {
     const resume = () => {
       void startMusic();
     };
-    window.addEventListener('pointerdown', resume, { once: true, capture: true });
-    window.addEventListener('keydown', resume, { once: true, capture: true });
+    window.addEventListener('pointerdown', resume, { capture: true });
+    window.addEventListener('touchstart', resume, { capture: true });
+    window.addEventListener('keydown', resume, { capture: true });
     return () => {
       cancelIdle();
       window.removeEventListener('pointerdown', resume, { capture: true });
+      window.removeEventListener('touchstart', resume, { capture: true });
       window.removeEventListener('keydown', resume, { capture: true });
     };
   }, [enabled, hydrated, startMusic, stopAll]);
 
   useEffect(() => () => stopAll(), [stopAll]);
 
+  const toggleMusic = useCallback(() => {
+    setEnabled((value) => {
+      if (value && audible) {
+        enabledRef.current = false;
+        stopAll();
+        return false;
+      }
+      enabledRef.current = true;
+      void startMusic();
+      return true;
+    });
+  }, [audible, startMusic, stopAll]);
+
+  const isPlaying = enabled && audible;
+
   return (
     <button
       type="button"
-      aria-label={enabled ? '关闭背景音乐' : '打开背景音乐'}
-      onClick={() => setEnabled((value) => !value)}
+      aria-label={isPlaying ? '关闭背景音乐' : '打开背景音乐'}
+      onClick={toggleMusic}
       className="fixed bottom-4 right-4 z-40 border border-ink/25 bg-paper/90 px-3 py-2 text-[10px] tracking-[0.25em] text-ink/70 shadow-[0_10px_24px_-18px_rgba(60,40,20,0.7)] backdrop-blur transition-colors hover:border-ink/50 hover:text-ink"
     >
-      {enabled ? '乐 关' : '乐 开'}
+      {isPlaying ? '乐 关' : '乐 开'}
     </button>
   );
 }
