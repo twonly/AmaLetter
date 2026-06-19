@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import { BackgroundMusic } from '@/components/BackgroundMusic';
 import './globals.css';
 
@@ -109,6 +110,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-paper text-ink">
         {children}
         <BackgroundMusic />
+        <Analytics />
       </body>
     </html>
   );
